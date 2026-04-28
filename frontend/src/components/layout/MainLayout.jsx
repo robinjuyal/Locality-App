@@ -1,10 +1,9 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useWs } from '../../context/WsContext'
-import { useState } from 'react'
 
 const navItems = [
-  { to: '/chat',          icon: '💬', label: 'Chat' },
+  { to: '/chat',          icon: '💬', label: 'Chats' },
   { to: '/announcements', icon: '📢', label: 'Notices' },
   { to: '/wallet',        icon: '💰', label: 'Wallet' },
   { to: '/people',        icon: '👥', label: 'People' },
@@ -12,74 +11,52 @@ const navItems = [
 ]
 
 export default function MainLayout() {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const { connected } = useWs()
-  const navigate = useNavigate()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const allItems = user?.role === 'ADMIN'
     ? [...navItems, { to: '/admin', icon: '⚙️', label: 'Admin' }]
     : navItems
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-[#111b21]">
       {/* Sidebar — desktop */}
-      <aside className="hidden md:flex flex-col w-60 bg-white border-r border-gray-200 shrink-0">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-lg">🏘️</div>
-            <div>
-              <p className="font-bold text-gray-900 text-sm leading-none">LocalityApp</p>
-              <div className="flex items-center gap-1 mt-0.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-green-500' : 'bg-gray-300'}`} />
-                <span className="text-xs text-gray-400">{connected ? 'Online' : 'Connecting...'}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <aside className="hidden lg:flex flex-col w-16 bg-[#202c33] border-r border-white/5 shrink-0 items-center py-4 gap-2">
+        <div className="w-9 h-9 bg-[#00a884] rounded-xl flex items-center justify-center text-lg mb-2">🏘️</div>
 
-        {/* Nav */}
-        <nav className="flex-1 p-3 space-y-1">
+        <div className="flex-1 flex flex-col gap-1 w-full px-2">
           {allItems.map(item => (
-            <NavLink key={item.to} to={item.to}
+            <NavLink key={item.to} to={item.to} title={item.label}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                 ${isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              <span className="text-lg">{item.icon}</span>
-              {item.label}
+                `flex flex-col items-center gap-0.5 py-2 px-1 rounded-xl text-xs transition-colors
+                 ${isActive ? 'bg-[#00a884]/20 text-[#00a884]' : 'text-gray-400 hover:bg-white/10 hover:text-white'}`}>
+              <span className="text-xl">{item.icon}</span>
+              <span className="text-[10px]">{item.label}</span>
             </NavLink>
           ))}
-        </nav>
+        </div>
 
-        {/* User footer */}
-        <div className="p-3 border-t border-gray-100">
-          <div className="flex items-center gap-2 px-2 py-2">
-            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">
-              {user?.name?.[0]?.toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-              <p className="text-xs text-gray-400 capitalize">{user?.role?.toLowerCase()}</p>
-            </div>
-            <button onClick={logout} title="Logout"
-              className="text-gray-400 hover:text-red-500 transition-colors text-sm">⏻</button>
+        <div className="mt-auto flex flex-col items-center gap-2 w-full px-2">
+          <div className={`w-2 h-2 rounded-full ${connected ? 'bg-[#00a884]' : 'bg-gray-500'}`} title={connected ? 'Connected' : 'Connecting...'} />
+          <div className="w-9 h-9 rounded-full bg-[#2a3942] flex items-center justify-center font-bold text-[#00a884] text-sm overflow-hidden cursor-pointer">
+            {user?.profilePic
+              ? <img src={user.profilePic} alt="" className="w-full h-full object-cover" />
+              : user?.name?.[0]?.toUpperCase()}
           </div>
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         <Outlet />
       </main>
 
       {/* Bottom nav — mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex z-50">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#202c33] border-t border-white/5 flex z-50 safe-area-inset-bottom">
         {allItems.map(item => (
           <NavLink key={item.to} to={item.to}
             className={({ isActive }) =>
               `flex-1 flex flex-col items-center py-2 text-xs transition-colors
-               ${isActive ? 'text-primary-600' : 'text-gray-500'}`}>
+               ${isActive ? 'text-[#00a884]' : 'text-gray-500'}`}>
             <span className="text-xl">{item.icon}</span>
             <span className="mt-0.5">{item.label}</span>
           </NavLink>

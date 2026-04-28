@@ -10,7 +10,9 @@ public class RoomDto {
     private String name;
     private String displayName;
     private String type;
+    private String groupIcon;
     private List<UserDto> members;
+    private UserDto otherUser; // for direct rooms, the other person
     private MessageDto lastMessage;
     private long unreadCount;
     private LocalDateTime createdAt;

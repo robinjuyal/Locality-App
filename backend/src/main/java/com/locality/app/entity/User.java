@@ -34,10 +34,10 @@ public class User {
     private String houseNumber;
 
     @Column(name = "shop_name")
-    private String shopName;  // only for SHOPKEEPER
+    private String shopName;
 
     @Column(name = "upi_id")
-    private String upiId;     // only for SHOPKEEPER, for nightly settlement
+    private String upiId;
 
     @Column(name = "is_active")
     @Builder.Default
@@ -46,13 +46,23 @@ public class User {
     @Column(name = "profile_pic")
     private String profilePic;
 
+    // Online presence
+    @Column(name = "is_online")
+    @Builder.Default
+    private boolean online = false;
+
+    @Column(name = "last_seen")
+    private LocalDateTime lastSeen;
+
+    // About / status text
+    @Column(name = "about")
+    @Builder.Default
+    private String about = "Hey, I'm on LocalityApp!";
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Wallet wallet;
-
-    @OneToMany(mappedBy = "sender")
-    private List<Message> sentMessages;
 }

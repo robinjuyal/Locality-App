@@ -28,30 +28,26 @@ public class AuthService {
     private final JwtUtils jwtUtils;
 
     public AuthResponse login(LoginRequest request) {
-        Authentication auth = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getPhone(), request.getPassword())
         );
-
         User user = userRepository.findByPhone(request.getPhone())
                 .orElseThrow(() -> new AppException("User not found"));
-
         if (!user.isActive()) throw new AppException("Account is deactivated");
 
+        // Mark online
+        userRepository.updateOnlineStatus(user.getId(), true, LocalDateTime.now());
+
         String token = jwtUtils.generateToken(user.getPhone(), user.getRole().name(), user.getId());
-        return AuthResponse.builder()
-                .token(token)
-                .user(toUserDto(user))
-                .build();
+        return AuthResponse.builder().token(token).user(toUserDto(user)).build();
     }
 
     @Transactional
     public UserDto registerUser(RegisterUserRequest request) {
-        if (userRepository.existsByPhone(request.getPhone())) {
+        if (userRepository.existsByPhone(request.getPhone()))
             throw new AppException("Phone number already registered");
-        }
 
         Role role = request.getRole() != null ? request.getRole() : Role.RESIDENT;
-
         User user = User.builder()
                 .phone(request.getPhone())
                 .name(request.getName())
@@ -62,16 +58,10 @@ public class AuthService {
                 .upiId(request.getUpiId())
                 .active(true)
                 .build();
-
         user = userRepository.save(user);
 
-        // Create wallet for every user
-        Wallet wallet = Wallet.builder()
-                .user(user)
-                .lastUpdated(LocalDateTime.now())
-                .build();
+        Wallet wallet = Wallet.builder().user(user).lastUpdated(LocalDateTime.now()).build();
         walletRepository.save(wallet);
-
         return toUserDto(user);
     }
 
@@ -85,6 +75,9 @@ public class AuthService {
                 .shopName(user.getShopName())
                 .profilePic(user.getProfilePic())
                 .active(user.isActive())
+                .online(user.isOnline())
+                .lastSeen(user.getLastSeen())
+                .about(user.getAbout())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

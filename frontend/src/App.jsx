@@ -10,18 +10,20 @@ import AdminPage from './pages/AdminPage'
 import ProfilePage from './pages/ProfilePage'
 import PeoplePage from './pages/PeoplePage'
 
+function Spinner() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-[#111b21]">
+      <div className="w-8 h-8 border-2 border-[#00a884] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
+
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth()
-  if (loading) return <div className="flex h-screen items-center justify-center"><Spinner /></div>
+  if (loading) return <Spinner />
   if (!user) return <Navigate to="/login" replace />
   if (adminOnly && user.role !== 'ADMIN') return <Navigate to="/" replace />
   return children
-}
-
-function Spinner() {
-  return (
-    <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
-  )
 }
 
 function AppRoutes() {

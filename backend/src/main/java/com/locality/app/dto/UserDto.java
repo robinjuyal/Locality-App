@@ -14,5 +14,8 @@ public class UserDto {
     private String shopName;
     private String profilePic;
     private boolean active;
+    private boolean online;
+    private LocalDateTime lastSeen;
+    private String about;
     private LocalDateTime createdAt;
 }

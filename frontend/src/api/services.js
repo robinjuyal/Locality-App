@@ -1,10 +1,8 @@
 import api from './axios'
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
 export const login = (phone, password) =>
   api.post('/api/auth/login', { phone, password }).then(r => r.data.data)
 
-// ── Users ─────────────────────────────────────────────────────────────────────
 export const getMe = () => api.get('/api/users/me').then(r => r.data.data)
 export const getAllUsers = () => api.get('/api/users').then(r => r.data.data)
 export const getShopkeepers = () => api.get('/api/users/shopkeepers').then(r => r.data.data)
@@ -15,37 +13,45 @@ export const uploadAvatar = (file) => {
 export const updateProfile = (params) =>
   api.patch('/api/users/me', null, { params }).then(r => r.data.data)
 
-// ── Chat ──────────────────────────────────────────────────────────────────────
 export const getRooms = () => api.get('/api/chat/rooms').then(r => r.data.data)
 export const openDirectRoom = (targetUserId) =>
   api.post(`/api/chat/rooms/direct/${targetUserId}`).then(r => r.data.data)
+export const createGroup = (groupName, memberIds) =>
+  api.post('/api/chat/rooms/group', { groupName, memberIds }).then(r => r.data.data)
 export const getMessages = (roomId, page = 0, size = 50) =>
   api.get(`/api/chat/rooms/${roomId}/messages`, { params: { page, size } }).then(r => r.data.data)
+export const getPinnedMessages = (roomId) =>
+  api.get(`/api/chat/rooms/${roomId}/pinned`).then(r => r.data.data)
+export const searchMessages = (roomId, q) =>
+  api.get(`/api/chat/rooms/${roomId}/search`, { params: { q } }).then(r => r.data.data)
 export const markRead = (roomId) => api.post(`/api/chat/rooms/${roomId}/read`)
+export const reactToMessage = (messageId, emoji) =>
+  api.post(`/api/chat/messages/${messageId}/react`, { emoji }).then(r => r.data.data)
+export const deleteMessage = (messageId) =>
+  api.delete(`/api/chat/messages/${messageId}`).then(r => r.data.data)
+export const pinMessage = (messageId) =>
+  api.post(`/api/chat/messages/${messageId}/pin`).then(r => r.data.data)
 export const uploadMedia = (file) => {
   const fd = new FormData(); fd.append('file', file)
   return api.post('/api/chat/upload', fd).then(r => r.data.data)
 }
+export const uploadVoice = (blob) => {
+  const fd = new FormData(); fd.append('file', blob, 'voice.webm')
+  return api.post('/api/chat/upload/voice', fd).then(r => r.data.data)
+}
 
-// ── Announcements ─────────────────────────────────────────────────────────────
 export const getAnnouncements = (page = 0) =>
   api.get('/api/announcements', { params: { page, size: 20 } }).then(r => r.data.data)
-export const getUrgentAnnouncements = () =>
-  api.get('/api/announcements/urgent').then(r => r.data.data)
 export const createAnnouncement = (data) =>
   api.post('/api/announcements', data).then(r => r.data.data)
 export const deleteAnnouncement = (id) => api.delete(`/api/announcements/${id}`)
 
-// ── Wallet ─────────────────────────────────────────────────────────────────────
 export const getMyWallet = () => api.get('/api/wallet/me').then(r => r.data.data)
 export const getTransactions = (page = 0) =>
   api.get('/api/wallet/transactions', { params: { page, size: 20 } }).then(r => r.data.data)
 export const payShopkeeper = (shopkeeperId, amount, note) =>
   api.post('/api/wallet/pay', { shopkeeperId, amount, note }).then(r => r.data.data)
-export const getShopkeeperWallet = () =>
-  api.get('/api/wallet/shopkeeper/me').then(r => r.data.data)
 
-// ── Admin ─────────────────────────────────────────────────────────────────────
 export const registerUser = (data) =>
   api.post('/api/admin/users/register', data).then(r => r.data.data)
 export const adminGetAllUsers = () =>

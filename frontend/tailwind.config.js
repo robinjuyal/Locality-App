@@ -5,10 +5,13 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-          300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6',
-          600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+          50: '#f0fdf9', 100: '#ccfbef', 200: '#99f6e0',
+          300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6',
+          600: '#00a884', 700: '#017561', 800: '#065f46', 900: '#064e3b'
         }
+      },
+      animation: {
+        'bounce': 'bounce 1s infinite',
       }
     }
   },

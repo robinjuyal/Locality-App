@@ -8,7 +8,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 @RestController
@@ -20,8 +19,8 @@ public class UserController {
     private final FileStorageService fileStorageService;
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserDto>> getMe(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.ok(userService.getByPhone(userDetails.getUsername())));
+    public ResponseEntity<ApiResponse<UserDto>> getMe(@AuthenticationPrincipal UserDetails ud) {
+        return ResponseEntity.ok(ApiResponse.ok(userService.getByPhone(ud.getUsername())));
     }
 
     @GetMapping
@@ -41,20 +40,19 @@ public class UserController {
 
     @PostMapping("/me/avatar")
     public ResponseEntity<ApiResponse<UserDto>> uploadAvatar(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam("file") MultipartFile file) {
-        UserDto user = userService.getByPhone(userDetails.getUsername());
+            @AuthenticationPrincipal UserDetails ud, @RequestParam("file") MultipartFile file) {
+        UserDto user = userService.getByPhone(ud.getUsername());
         String url = fileStorageService.storeFile(file, "avatars");
-        UserDto updated = userService.updateProfile(user.getId(), null, null, url);
-        return ResponseEntity.ok(ApiResponse.ok("Avatar updated", updated));
+        return ResponseEntity.ok(ApiResponse.ok("Avatar updated", userService.updateProfile(user.getId(), null, null, url, null)));
     }
 
     @PatchMapping("/me")
     public ResponseEntity<ApiResponse<UserDto>> updateProfile(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetails ud,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String houseNumber) {
-        UserDto user = userService.getByPhone(userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.ok(userService.updateProfile(user.getId(), name, houseNumber, null)));
+            @RequestParam(required = false) String houseNumber,
+            @RequestParam(required = false) String about) {
+        UserDto user = userService.getByPhone(ud.getUsername());
+        return ResponseEntity.ok(ApiResponse.ok(userService.updateProfile(user.getId(), name, houseNumber, null, about)));
     }
 }
